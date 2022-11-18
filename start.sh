@@ -1,5 +1,7 @@
 #!/bin/sh
 echo "Starting pulseaudio..."
+rm -rf .config/pulse
+rm -rf /tmp/pulse*
 pulseaudio -D --exit-idle-time=-1
 
 sleep 2
