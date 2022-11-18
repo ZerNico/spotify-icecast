@@ -47,7 +47,10 @@ COPY --from=handler /go/src/spotify-icecast/spotify-icecast /home/user/spotify-i
 
 
 RUN chmod +x /home/user/start.sh \
-    && chmod +x /home/user/librespot
+    && chmod +x /home/user/librespot \
+    && chmod +x /home/user/librespot-token \
+    && chmod +x /home/user/spotify-icecast \
+    && chmod +x /home/user/event.sh
 
 USER user
 WORKDIR /home/user
