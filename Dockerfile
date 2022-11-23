@@ -16,7 +16,7 @@ RUN apt update && apt install -y pulseaudio libasound2-dev libavahi-compat-libdn
 WORKDIR /usr/src/
 RUN git clone https://github.com/librespot-org/librespot
 WORKDIR /usr/src/librespot
-RUN cargo build --release --no-default-features --features pulseaudio-backend
+RUN cargo build --release --features pulseaudio-backend
 
 
 
@@ -32,10 +32,9 @@ RUN go build
 
 
 
-FROM debian:stable-slim
+FROM ubuntu:latest
 
-RUN apt update \
-    && apt install -y pulseaudio alsa-utils darkice ca-certificates curl
+RUN apt update && apt install -y pulseaudio ca-certificates curl darkice
 RUN useradd -ms /bin/bash user
 
 ADD start.sh /home/user/start.sh
