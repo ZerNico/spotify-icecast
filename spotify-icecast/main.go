@@ -34,12 +34,21 @@ func main() {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 	u := url.URL{Scheme: "ws", Host: "localhost:24879", Path: "/events"}
-	log.Printf("connecting to %s", u.String())
-	c, resp, err := websocket.DefaultDialer.Dial(u.String(), nil)
-	if err != nil {
-		log.Printf("handshake failed with status %d", resp.StatusCode)
-		log.Fatal("dial:", err)
-	}
+	log.Print("connecting to librespot")
+
+	var c *websocket.Conn
+
+	for {
+		conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+
+		if err != nil {
+			log.Printf("handshake failed")
+			time.Sleep(1 * time.Second)
+		} else {
+			c = conn
+			break
+		}
+  }
 
 	//When the program closes, close the connection
 	defer c.Close()

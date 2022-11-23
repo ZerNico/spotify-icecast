@@ -16,4 +16,4 @@ sed -ri "s/SPOTIFY_PASSWORD/$SPOTIFY_PASSWORD/" ./config.toml
 sed -ri "s/SPOTIFY_DEVICE_NAME/$SPOTIFY_DEVICE_NAME/" ./config.toml
 
 echo "Starting spotify-icecast and librespot..."
-java -jar librespot.jar & sleep 10 && ./spotify-icecast
+java -jar librespot.jar & ./spotify-icecast
