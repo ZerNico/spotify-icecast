@@ -11,5 +11,9 @@ do
     eval echo "$line"
 done < "./darkice_template.cfg" > "./darkice.cfg"
 
+sed -ri "s/SPOTIFY_USERNAME/$SPOTIFY_USERNAME/" ./config.toml
+sed -ri "s/SPOTIFY_PASSWORD/$SPOTIFY_PASSWORD/" ./config.toml
+sed -ri "s/SPOTIFY_DEVICE_NAME/$SPOTIFY_DEVICE_NAME/" ./config.toml
+
 echo "Starting spotify-icecast and librespot..."
-darkice -c ./darkice.cfg & ./librespot -q --name $SPOTIFY_DEVICE_NAME -u $SPOTIFY_USERNAME -p $SPOTIFY_PASSWORD --backend pulseaudio --bitrate 320 --onevent ./event.sh --cache /tmp/librespot
+java -jar librespot.jar & sleep 10 && ./spotify-icecast

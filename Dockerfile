@@ -1,29 +1,38 @@
-FROM rustlang/rust:nightly AS librespot
+FROM golang:1.19-alpine AS handler
 
-RUN apt update && apt install -y pulseaudio libasound2-dev libavahi-compat-libdnssd-dev pkg-config
+ENV CGO_ENABLED=0
 
-WORKDIR /usr/src/
-RUN git clone https://github.com/librespot-org/librespot
-WORKDIR /usr/src/librespot
-RUN cargo build --release --features pulseaudio-backend
+WORKDIR /go/src/
+ADD spotify-icecast /go/src/spotify-icecast
+WORKDIR /go/src/spotify-icecast
+RUN go mod download
+RUN go build
 
-FROM ubuntu:latest
 
-RUN apt update && apt install -y pulseaudio ca-certificates curl darkice
+FROM debian:buster-slim
+
+ENV JAVA_HOME=/opt/java/openjdk
+COPY --from=eclipse-temurin:11 $JAVA_HOME $JAVA_HOME
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+ARG LIBRESPOT_VERSION=1.6.2
+
+RUN apt update && apt install -y pulseaudio ca-certificates wget darkice
 RUN useradd -ms /bin/bash user
+WORKDIR /home/user
+
+RUN wget -O librespot.jar https://github.com/librespot-org/librespot-java/releases/download/v$LIBRESPOT_VERSION/librespot-api-$LIBRESPOT_VERSION.jar
 
 ADD start.sh /home/user/start.sh
 ADD darkice_template.cfg /home/user/darkice_template.cfg
-ADD event.sh /home/user/event.sh
-COPY --from=librespot /usr/src/librespot/target/release/librespot /home/user/librespot
+ADD config.toml /home/user/config.toml
+COPY --from=handler /go/src/spotify-icecast/spotify-icecast /home/user/spotify-icecast
 
 
-RUN chmod +x /home/user/start.sh \
-    && chmod +x /home/user/librespot \
-    && chmod +x /home/user/event.sh
+RUN chmod +x /home/user/start.sh && chmod +x /home/user/spotify-icecast
 
 USER user
-WORKDIR /home/user
+
 
 ENTRYPOINT [ "./start.sh" ]
 
